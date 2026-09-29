@@ -1,21 +1,41 @@
 {
-  "name": "nikivils-grimoire-contracts",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@nikivils/grimoire-contracts",
+  "version": "0.1.0",
+  "description": "Shared API contracts for Nikivils Grimoire",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NikitaVirachev/nikivils-grimoire-contracts.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "author": "Nikita Virachev",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/NikitaVirachev/nikivils-grimoire-contracts/issues"
   },
-  "homepage": "https://github.com/NikitaVirachev/nikivils-grimoire-contracts#readme"
+  "homepage": "https://github.com/NikitaVirachev/nikivils-grimoire-contracts#readme",
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2"
+  }
 }
