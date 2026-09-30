@@ -1,0 +1,146 @@
+import { z } from 'zod';
+
+export const postStatusSchema = z.enum(['draft', 'published']);
+
+export type PostStatus = z.infer<typeof postStatusSchema>;
+
+export const blockIdSchema = z.string().uuid();
+
+export const paragraphBlockSchema = z
+  .object({
+    id: blockIdSchema,
+
+    type: z.literal('paragraph'),
+
+    text: z.string(),
+  })
+  .strict();
+
+export type ParagraphBlock = z.infer<typeof paragraphBlockSchema>;
+
+export const headingBlockSchema = z
+  .object({
+    id: blockIdSchema,
+
+    type: z.literal('heading'),
+
+    text: z.string(),
+
+    level: z.union([
+      z.literal(1),
+      z.literal(2),
+      z.literal(3),
+      z.literal(4),
+      z.literal(5),
+      z.literal(6),
+    ]),
+  })
+  .strict();
+
+export type HeadingBlock = z.infer<typeof headingBlockSchema>;
+
+export const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId');
+
+export const imageBlockSchema = z
+  .object({
+    id: blockIdSchema,
+
+    type: z.literal('image'),
+
+    imageId: objectIdSchema,
+
+    alt: z.string().default(''),
+
+    caption: z.string().default(''),
+  })
+  .strict();
+
+export type ImageBlock = z.infer<typeof imageBlockSchema>;
+
+export const quoteBlockSchema = z
+  .object({
+    id: blockIdSchema,
+
+    type: z.literal('quote'),
+
+    text: z.string(),
+
+    author: z.string().default(''),
+  })
+  .strict();
+
+export type QuoteBlock = z.infer<typeof quoteBlockSchema>;
+
+export const postBlockSchema = z.discriminatedUnion('type', [
+  paragraphBlockSchema,
+  headingBlockSchema,
+  imageBlockSchema,
+  quoteBlockSchema,
+]);
+
+export type PostBlock = z.infer<typeof postBlockSchema>;
+
+export const postContentSchema = z
+  .object({
+    version: z.literal(1),
+
+    blocks: z.array(postBlockSchema).max(1000),
+  })
+  .strict();
+
+export type PostContent = z.infer<typeof postContentSchema>;
+
+export const postCoverSchema = z
+  .object({
+    imageId: objectIdSchema,
+
+    alt: z.string().default(''),
+  })
+  .strict();
+
+export type PostCover = z.infer<typeof postCoverSchema>;
+
+const postBaseSchema = z
+  .object({
+    title: z.string().trim().min(1).max(200),
+
+    overview: z.string().trim().max(1000),
+
+    cover: postCoverSchema.nullable(),
+
+    content: postContentSchema,
+
+    tags: z.array(z.string().trim().min(1)),
+
+    status: postStatusSchema,
+  })
+  .strict();
+
+export const createPostSchema = z
+  .object({
+    title: postBaseSchema.shape.title,
+
+    overview: postBaseSchema.shape.overview,
+
+    cover: postBaseSchema.shape.cover.optional(),
+
+    content: postBaseSchema.shape.content.default({
+      version: 1,
+      blocks: [],
+    }),
+
+    tags: postBaseSchema.shape.tags.default([]),
+
+    status: postBaseSchema.shape.status.default('draft'),
+  })
+  .strict();
+
+export type CreatePostRequest = z.infer<typeof createPostSchema>;
+
+export const updatePostSchema = postBaseSchema
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'At least one field must be provided',
+  });
+
+export type UpdatePostRequest = z.infer<typeof updatePostSchema>;
