@@ -1,10 +1,27 @@
 import { z } from 'zod';
 
+const RESERVED_AUTHOR_NAMES = new Set(['admin', 'administrator', 'moderator', 'owner', 'nikivils']);
+
+const authorNameSchema = z
+  .string()
+  .trim()
+  .min(2, 'Author name must contain at least 2 characters')
+  .max(50, 'Author name must contain at most 50 characters')
+  .refine((value) => !RESERVED_AUTHOR_NAMES.has(value.toLowerCase()), {
+    message: 'This author name is reserved',
+  });
+
 export const createCommentSchema = z
   .object({
-    authorName: z.string().trim().min(2).max(50).optional(),
+    authorName: z.preprocess((value) => {
+      if (typeof value === 'string' && value.trim() === '') {
+        return undefined;
+      }
 
-    text: z.string().trim().min(1).max(5000),
+      return value;
+    }, authorNameSchema.optional()),
+
+    text: z.string().trim().min(1, 'Comment cannot be empty').max(5000, 'Comment is too long'),
   })
   .strict();
 
