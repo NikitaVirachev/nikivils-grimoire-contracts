@@ -41,8 +41,6 @@ export const headingBlockSchema = z
 
 export type HeadingBlock = z.infer<typeof headingBlockSchema>;
 
-export const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId');
-
 export const imageBlockSchema = z
   .object({
     id: blockIdSchema,
@@ -146,3 +144,35 @@ export const updatePostSchema = postBaseSchema
   });
 
 export type UpdatePostRequest = z.infer<typeof updatePostSchema>;
+
+const postBaseDtoSchema = z.object({
+  _id: objectIdSchema,
+
+  title: z.string(),
+
+  overview: z.string(),
+
+  cover: coverSchema.optional(),
+
+  tags: z.array(z.string()),
+
+  publishedAt: z.iso.datetime().nullable(),
+
+  createdAt: z.iso.datetime(),
+});
+
+export const postDtoSchema = postBaseDtoSchema
+  .extend({
+    content: postContentSchema,
+
+    status: postStatusSchema,
+
+    updatedAt: z.iso.datetime(),
+  })
+  .strict();
+
+export type PostDto = z.infer<typeof postDtoSchema>;
+
+export const postSummaryDtoSchema = postBaseDtoSchema.strict();
+
+export type PostSummaryDto = z.infer<typeof postSummaryDtoSchema>;
