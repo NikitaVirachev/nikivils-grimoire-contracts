@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { objectIdSchema } from './common';
+
 export const postStatusSchema = z.enum(['draft', 'published']);
 
 export type PostStatus = z.infer<typeof postStatusSchema>;
