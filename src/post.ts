@@ -4,7 +4,7 @@ export const postStatusSchema = z.enum(['draft', 'published']);
 
 export type PostStatus = z.infer<typeof postStatusSchema>;
 
-export const blockIdSchema = z.string().uuid();
+export const blockIdSchema = z.uuid('Invalid block ID');
 
 export const paragraphBlockSchema = z
   .object({
@@ -12,7 +12,7 @@ export const paragraphBlockSchema = z
 
     type: z.literal('paragraph'),
 
-    text: z.string(),
+    text: z.string().max(50_000),
   })
   .strict();
 
@@ -24,7 +24,7 @@ export const headingBlockSchema = z
 
     type: z.literal('heading'),
 
-    text: z.string(),
+    text: z.string().max(1_000),
 
     level: z.union([
       z.literal(1),
@@ -49,9 +49,9 @@ export const imageBlockSchema = z
 
     imageId: objectIdSchema,
 
-    alt: z.string().default(''),
+    alt: z.string().max(1_000).default(''),
 
-    caption: z.string().default(''),
+    caption: z.string().max(2_000).default(''),
   })
   .strict();
 
@@ -63,9 +63,9 @@ export const quoteBlockSchema = z
 
     type: z.literal('quote'),
 
-    text: z.string(),
+    text: z.string().max(20_000),
 
-    author: z.string().default(''),
+    author: z.string().max(500).default(''),
   })
   .strict();
 
@@ -90,27 +90,27 @@ export const postContentSchema = z
 
 export type PostContent = z.infer<typeof postContentSchema>;
 
-export const postCoverSchema = z
+export const coverSchema = z
   .object({
     imageId: objectIdSchema,
 
-    alt: z.string().default(''),
+    alt: z.string().max(1_000).default(''),
   })
   .strict();
 
-export type PostCover = z.infer<typeof postCoverSchema>;
+export type PostCover = z.infer<typeof coverSchema>;
 
 const postBaseSchema = z
   .object({
     title: z.string().trim().min(1).max(200),
 
-    overview: z.string().trim().max(1000),
+    overview: z.string().trim().min(1).max(1000),
 
-    cover: postCoverSchema.nullable(),
+    cover: coverSchema.nullable(),
 
     content: postContentSchema,
 
-    tags: z.array(z.string().trim().min(1)),
+    tags: z.array(z.string().trim().min(1).max(100)),
 
     status: postStatusSchema,
   })
