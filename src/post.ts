@@ -146,7 +146,7 @@ export const updatePostSchema = postBaseSchema
 export type UpdatePostRequest = z.infer<typeof updatePostSchema>;
 
 const postBaseDtoSchema = z.object({
-  _id: objectIdSchema,
+  id: objectIdSchema,
 
   title: z.string(),
 

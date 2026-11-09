@@ -28,7 +28,7 @@ export const createCommentSchema = z
 export type CreateCommentRequest = z.infer<typeof createCommentSchema>;
 
 export const commentSchema = z.object({
-  _id: z.string(),
+  id: z.string(),
   postId: z.string(),
 
   authorName: z.string(),

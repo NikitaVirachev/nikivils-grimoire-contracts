@@ -4,7 +4,7 @@ import { objectIdSchema } from './common';
 
 export const mediaSchema = z
   .object({
-    _id: objectIdSchema,
+    id: objectIdSchema,
 
     filename: z.string(),
 
